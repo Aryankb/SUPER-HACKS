@@ -14,5 +14,4 @@ Agentic/extracted_repo/
 Agentic/media/
 .env
 cron2_midnight.py
-reminder_cron.py
 Agentic/tools/chroma_db/

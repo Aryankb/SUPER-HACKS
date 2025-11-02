@@ -2,12 +2,10 @@
 
 # SIGMOYD: YOUR PERSONAL AI ASSISTANT ON WHATSAPP
 
-**Live Demo Available**:  [link](https://drive.google.com/file/d/10_FIgGWq08ZGp7OWQ9nH5qajTVCirSlx/view?usp=drivesdk)
+**Demo**:  [link](https://drive.google.com/file/d/10_FIgGWq08ZGp7OWQ9nH5qajTVCirSlx/view?usp=drivesdk)
 
 ---
-### Deployed Endpoint URL (Beta version releasing soon)
-
-[link](https://www.sigmoyd.in/whatsapp)
+### LIVE LINK : [lIVE](https://www.sigmoyd.in/whatsapp)
 
 
 ---

@@ -5,7 +5,7 @@
 **Demo**:  [link](https://drive.google.com/file/d/10_FIgGWq08ZGp7OWQ9nH5qajTVCirSlx/view?usp=drivesdk)
 
 ---
-### LIVE LINK : [lIVE](https://www.sigmoyd.in/whatsapp)
+### LIVE LINK : [LIVE](https://www.sigmoyd.in/whatsapp)
 
 
 ---

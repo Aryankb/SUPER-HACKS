@@ -1,0 +1,36 @@
+services:
+  fastapi_app:
+    image: aryan270/sigmoyd-backend:latest
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/Agentic
+    volumes:
+      - chromadb-data:/app/chroma_storage   # <--- persistent storage
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    image: aryan270/sigmoyd-backend:latest
+    container_name: celery_worker
+    command: celery -A Workflow_ec2.start_flow.celery_app worker --loglevel=info --concurrency=2
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/Agentic
+    volumes:
+      - chromadb-data:/app/chroma_storage   # <--- same volume if worker also needs access
+
+volumes:
+  chromadb-data:

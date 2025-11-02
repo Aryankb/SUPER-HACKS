@@ -1,0 +1,115 @@
+name: Deploy Backend with Docker
+
+on:
+  push:
+    branches:
+      - main  # Deploys on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DEEPSEEK: ${{ secrets.DEEPSEEK }}
+      WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+      REDIRECT_URI: ${{ secrets.REDIRECT_URI }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      COMPOSIO_API_KEY: ${{ secrets.COMPOSIO_API_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      CLERK_JWKS_URL: ${{ secrets.CLERK_JWKS_URL }}
+      CLERK_ISSUER: ${{ secrets.CLERK_ISSUER }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      RZP_KEY: ${{ secrets.RZP_KEY }}
+      RZP_SECRET: ${{ secrets.RZP_SECRET }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/sigmoyd-backend:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/sigmoyd-backend:latest
+
+   
+
+    - name: Set up SSH
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" | tr -d '\r' > private_key
+        chmod 600 private_key
+
+    - name: Debug EC2 host
+      run: echo "EC2 host is ${{ secrets.EC2_HOST }}"
+
+    - name: Copy docker-compose.yml to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -i private_key docker-compose.yml ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/docker-compose.yml
+
+
+    - name: Create .env file on EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@${{ secrets.EC2_HOST }} << EOF
+          cat <<EOT > /home/ec2-user/.env
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            DEEPSEEK=${{ secrets.DEEPSEEK }}
+            WHATSAPP_TOKEN=${{ secrets.WHATSAPP_TOKEN }}
+            REDIRECT_URI=${{ secrets.REDIRECT_URI }}
+            CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+            CLIENT_ID=${{ secrets.CLIENT_ID }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            COMPOSIO_API_KEY=${{ secrets.COMPOSIO_API_KEY }}
+            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+            CLERK_JWKS_URL=${{ secrets.CLERK_JWKS_URL }}
+            CLERK_ISSUER=${{ secrets.CLERK_ISSUER }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+            RZP_KEY=${{ secrets.RZP_KEY }}
+            RZP_SECRET=${{ secrets.RZP_SECRET }}
+          EOT
+        EOF
+                
+    # - name: Deploy to EC2
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no -i private_key ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+    #       # Pull the latest Docker image
+    #       # Stop and remove any existing container
+    #       docker stop sigmoyd-backend || true
+    #       docker rm sigmoyd-backend || true
+    #       docker image prune -a -f
+    #       docker pull ${{ secrets.DOCKER_USERNAME }}/sigmoyd-backend:latest
+          
+    #       # Run the new container in detached mode
+    #       docker run -d --name sigmoyd-backend -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/sigmoyd-backend:latest
+          
+    #       # Confirm container is running
+    #       docker ps -a
+    #     EOF
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /home/ec2-user
+          docker stop sigmoyd-backend || true
+          docker rm sigmoyd-backend || true
+
+          # Stop existing services
+          docker-compose down || true
+
+          docker image prune -a -f
+          
+          # Pull latest image
+          docker pull ${{ secrets.DOCKER_USERNAME }}/sigmoyd-backend:latest
+          
+          # Rebuild and start all services
+          docker-compose up -d --build
+          
+          docker ps -a
+        EOF

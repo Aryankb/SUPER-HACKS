@@ -1,0 +1,31 @@
+[
+
+
+    {
+        "name":"USER_VALIDATION",
+        "description":"take validaton from user in between the workflow",
+        "inputs":["question_to_ask"],
+        "outputs":["answer from user"]
+    },
+    
+    {
+        "name":"FILE_UPLOAD",
+        "description":"Take file input from user and upload to server, returns the location",
+        "inputs":[""],
+        "outputs":["file s3 path (Remember it only returns the location of file, not the content)"]
+    },
+    {
+        "name":"TEXT_INPUT",
+        "description":"take text input from user",
+        "inputs":["text"], 
+        "outputs":["text"]
+    },
+    {
+        "name":"PDF_TO_TEXT",
+        "description":"extract text from pdf file/s",
+        "inputs":["pdf_paths"],
+        "outputs":["extracted text from pdf file/s"]
+    }
+
+    
+]

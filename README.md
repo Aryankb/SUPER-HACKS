@@ -2,13 +2,13 @@
 
 # SIGMOYD: Prompt-to-Orchestrate Framework
 
-**Live Demo Available**:  [link](https://drive.google.com/file/d/1X0Zo8X7ABYp8_7eBHGHsRqR4HaCZUkVE/view?usp=drivesdk)
+**Live Demo Available**:  [link](https://drive.google.com/file/d/10_FIgGWq08ZGp7OWQ9nH5qajTVCirSlx/view?usp=drivesdk)
 Watch how Sigmoyd searches the latest **LinkedIn job posts**, generates **cold emails**, and sends them instantly to recruiters — **fully automated**!
 
 ---
 ### Deployed Endpoint URL (Beta version releasing soon)
 
-[link](microsoft-iota.vercel.app)
+[link](https://www.sigmoyd.in/whatsapp)
 
 ---
 
